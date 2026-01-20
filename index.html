@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Valentine ❤️</title>
+    <style>
+        :root { --pink: #ffafbd; --hot-pink: #ff4d6d; --bg: #fff0f3; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); font-family: 'Georgia', serif; overflow-x: hidden; color: #444; }
+        
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; text-align: center; }
+        section { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.8s ease; }
+        .active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Gallery Grid */
+        .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .photo-grid img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        /* Message Box */
+        .love-letter { background: white; padding: 30px; border-radius: 20px; border: 2px dashed var(--hot-pink); line-height: 1.6; margin: 20px 0; }
+
+        /* Game Board */
+        .game-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 350px; }
+        .card { width: 70px; height: 70px; background: var(--hot-pink); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; cursor: pointer; }
+        .card.matched { background: white; border: 2px solid var(--hot-pink); color: var(--hot-pink); }
+
+        /* Buttons */
+        .btn { background: var(--hot-pink); color: white; padding: 15px 30px; border: none; border-radius: 50px; font-size: 18px; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn:hover { transform: scale(1.05); background: #ff3355; }
+        
+        #noBtn { position: absolute; transition: 0.2s; background: #999; }
+        .final-btns { position: relative; width: 100%; height: 300px; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <section id="step1" class="active">
+            <h1 style="font-size: 3rem; color: var(--hot-pink);">Allu Handsome! ❤️</h1>
+            <p>I made something special for you...</p>
+            <button class="btn" onclick="next(2)">Open It ✨</button>
+        </section>
+
+        <section id="step2">
+            <h2>Some of my favorite views...</h2>
+            <div class="photo-grid">
+                <img src="https://i.ibb.co/7tbL1G6d/unnamed.jpg" alt="Photo 1">
+                <img src="https://i.ibb.co/hxQyNL4k/unnamed-1.jpg" alt="Photo 2">
+                <img src="https://i.ibb.co/BHY72WtY/unnamed-2.jpg" alt="Photo 3">
+                <img src="https://i.ibb.co/qYhXXhJC/unnamed-3.jpg" alt="Photo 4">
+            </div>
+            <button class="btn" onclick="next(3)">Next: A Message</button>
+        </section>
+
+        <section id="step3">
+            <div class="love-letter">
+                <h3>My Husband,</h3>
+                <p>Every moment with you feels like a dream. My husband, my one and only and my everything I love you and i always will, forever and ever. I appreciate everything you do for me.</p>
+                <p><b>Forever yours. ❤️</b></p>
+            </div>
+            <button class="btn" onclick="next(4)">One quick game?</button>
+        </section>
+
+        <section id="step4">
+            <h2>Find the Pairs! 🧸</h2>
+            <div class="game-board" id="board"></div>
+            <button class="btn" id="gameNext" style="display:none;" onclick="next(5)">Last thing... 💌</button>
+        </section>
+
+        <section id="step5">
+            <h1 style="color: var(--hot-pink); font-size: 2.5rem;">Will you be my Valentine?</h1>
+            <div class="final-btns">
+                <button id="yesBtn" class="btn" style="position: absolute; left: 20%;" onclick="alert('Yay! I love you! ❤️');">YES</button>
+                <button id="noBtn" class="btn" style="right: 20%;" onmouseover="moveNo()">NO</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function next(num) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + num).classList.add('active');
+            if(num === 4) setupGame();
+        }
+
+        function moveNo() {
+            const btn = document.getElementById('noBtn');
+            const x = Math.random() * (window.innerWidth - 120);
+            const y = Math.random() * (window.innerHeight - 100);
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+
+        function setupGame() {
+            const icons = ['❤️', '💖', '🌹', '💍', '🧸', '🍭', '🍓', '💌'];
+            let cards = [...icons, ...icons].sort(() => Math.random() - 0.5);
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            let selected = [];
+            let matchedCount = 0;
+
+            cards.forEach((icon, i) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = '?';
+                card.onclick = () => {
+                    if (selected.length < 2 && card.innerHTML === '?') {
+                        card.innerHTML = icon;
+                        selected.push({card, icon});
+                        if (selected.length === 2) {
+                            if (selected[0].icon === selected[1].icon) {
+                                selected[0].card.classList.add('matched');
+                                selected[1].card.classList.add('matched');
+                                matchedCount++;
+                                selected = [];
+                                if (matchedCount === 8) document.getElementById('gameNext').style.display = 'block';
+                            } else {
+                                setTimeout(() => {
+                                    selected[0].card.innerHTML = '?';
+                                    selected[1].card.innerHTML = '?';
+                                    selected = [];
+                                }, 500);
+                            }
+                        }
+                    }
+                };
+                board.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
